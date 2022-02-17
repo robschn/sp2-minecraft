@@ -68,10 +68,11 @@ resource "stackpath_compute_workload" "minecraft-server" {
 }
 
 resource "stackpath_compute_network_policy" "minecraft-server" {
-  name        = "Allow Minecraft traffic to Minecraft servers"
-  slug        = "mc-port-allow"
-  description = "A network policy that allows port 25565 used for Minecraft server"
-  priority    = 20000
+  name         = "Allow Minecraft traffic to Minecraft servers"
+  slug         = "mc-port-allow"
+  description  = "A network policy that allows port 25565 used for Minecraft server"
+  priority     = 20000
+  policy_types = ["INGRESS"]
 
   instance_selector {
     key      = "workload.platform.stackpath.net/workload-slug"
@@ -79,14 +80,12 @@ resource "stackpath_compute_network_policy" "minecraft-server" {
     values   = ["mc-slug"]
   }
 
-  policy_types = ["INGRESS"]
-
   ingress {
     action      = "ALLOW"
     description = "Allow port 25565 from Home IP"
     protocol {
       tcp {
-        destination_ports = [25565]
+        source_ports = [25565]
       }
     }
     from {
