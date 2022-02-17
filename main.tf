@@ -11,6 +11,7 @@ terraform {
 variable "stack_id" {}
 variable "client_id" {}
 variable "client_secret" {}
+variable "home_ip" {}
 
 # Configure the StackPath Provider
 provider "stackpath" {
@@ -22,7 +23,7 @@ provider "stackpath" {
 # Create a new container
 resource "stackpath_compute_workload" "minecraft-server" {
   name = "Minecraft Server"
-  slug = "minecrafter-server-slug"
+  slug = "mc-slug"
 
   network_interface {
     network = "default"
@@ -68,14 +69,14 @@ resource "stackpath_compute_workload" "minecraft-server" {
 
 resource "stackpath_compute_network_policy" "minecraft-server" {
   name        = "Allow Minecraft traffic to Minecraft servers"
-  slug        = "minecraft-port-allow"
+  slug        = "mc-port-allow"
   description = "A network policy that allows port 25565 used for Minecraft server"
   priority    = 20000
 
   instance_selector {
     key      = "workload.platform.stackpath.net/workload-slug"
     operator = "in"
-    values   = ["minecrafter-server-slug"]
+    values   = ["mc-slug"]
   }
 
   policy_types = ["INGRESS"]
@@ -90,7 +91,7 @@ resource "stackpath_compute_network_policy" "minecraft-server" {
     }
     from {
       ip_block {
-        cidr = "50.89.245.120/32"
+        cidr = var.home_ip
       }
     }
   }
